@@ -2,6 +2,8 @@
 
 Select a Chinese name for my baby. 
 
+No "八字"! No "五行"! No "运势"! No "星座"!
+
 Features:
 
 - Characters are chosen from (famous) texts. You can add your own texts.
