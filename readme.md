@@ -27,8 +27,9 @@ tested under Python 2.7 and [kivy 1.8.0](http://kivy.org/).
 
 # todo
 
-- data support
+- add data support
 	- google search result of names
 	- show character meaning if needed
 	- show sources of suggested names
+- UI improvement
 - packaging for iOS and Android
