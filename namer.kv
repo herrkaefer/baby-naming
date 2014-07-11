@@ -1,0 +1,435 @@
+#:kivy 1.8.0
+
+<NameButton@ToggleButton>:
+    font_name: 'kaiti.ttf'
+    font_size: 30
+ 
+<FirstNameButton@Button>:
+    font_name: 'kaiti.ttf'
+    font_size: 30
+
+<CMDButton@Button>:
+    font_name: 'kaiti.ttf'
+    font_size: 25
+
+<ChineseLabel@Label>:
+    font_name: 'kaiti.ttf'
+    font_size: 25
+    text: ""
+
+<ChineseTextInput@TextInput>:
+    font_name: 'kaiti.ttf'
+    font_size: 25
+
+<CandidateLabel@Label>:
+    font_name: 'kaiti.ttf'
+    font_size: 25
+    color: 0,0,0,1
+
+<RemoveButton@Button>:
+    text: "remove"
+    background_color: .8,.6,.6, 1
+
+
+<NamesScreen>:
+    char1_1: name1_1
+    char1_2: name1_2
+    char2_1: name2_1
+    char2_2: name2_2
+    char3_1: name3_1
+    char3_2: name3_2
+    char4_1: name4_1
+    char4_2: name4_2
+    char5_1: name5_1
+    char5_2: name5_2
+    char6_1: name6_1
+    char6_2: name6_2
+    char7_1: name7_1
+    char7_2: name7_2
+    char8_1: name8_1
+    char8_2: name8_2
+
+    checkbox1: cb1
+    checkbox2: cb2
+    checkbox3: cb3
+    checkbox4: cb4
+    checkbox5: cb5
+    checkbox6: cb6
+    checkbox7: cb7
+    checkbox8: cb8
+
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        canvas.before:
+            Color:
+                rgb: .7, .8, .9
+            Rectangle:
+                size: self.size
+                source: 'data/background.png'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: 10
+            spacing: 10
+            size_hint: 1, 0.15
+
+            Button:
+                id: settings_btn
+                text: 'Setting'
+                pos_hint: {'top': 0.95}
+                on_press: root.manager.current = 'settings'
+
+            Label:
+                pos_hint: {'top': 0.95}
+
+            Label:
+                pos_hint: {'top': 0.95}
+
+            Button:
+                id: candidates_btn
+                text: 'Candidates'
+                pos_hint: {'top': 0.95}
+                on_press: root.manager.current = 'candidates'
+
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 0
+            spacing: 20
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name1_1
+                    on_press: 
+                        root.toggle_character(self, 1, 1)
+                NameButton:
+                    id: name1_2
+                    on_press: root.toggle_character(self, 1, 2)
+                CheckBox:
+                    id: cb1
+                    on_active: root.set_active(self, 1)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name2_1
+                    on_press: root.toggle_character(self, 2, 1)
+                NameButton:
+                    id: name2_2
+                    on_press: root.toggle_character(self, 2, 2)
+                CheckBox:
+                    id: cb2
+                    on_active: root.set_active(self, 2)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name3_1
+                    on_press: root.toggle_character(self, 3, 1)
+                NameButton:
+                    id: name3_2
+                    on_press: root.toggle_character(self, 3, 2)
+                CheckBox:
+                    id: cb3
+                    on_active: root.set_active(self, 3)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name4_1
+                    on_press: root.toggle_character(self, 4, 1)
+                NameButton:
+                    id: name4_2
+                    on_press: root.toggle_character(self, 4, 2)
+                CheckBox:
+                    id: cb4
+                    on_active: root.set_active(self, 4)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name5_1
+                    on_press: root.toggle_character(self, 5, 1)
+                NameButton:
+                    id: name5_2
+                    on_press: root.toggle_character(self, 5, 2)
+                CheckBox:
+                    id: cb5
+                    on_active: root.set_active(self, 5)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name6_1
+                    on_press: root.toggle_character(self, 6, 1)
+                NameButton:
+                    id: name6_2
+                    on_press: root.toggle_character(self, 6, 2)
+                CheckBox:
+                    id: cb6
+                    on_active: root.set_active(self, 6)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name7_1
+                    on_press: root.toggle_character(self, 7, 1)
+                NameButton:
+                    id: name7_2
+                    on_press: root.toggle_character(self, 7, 2)
+                CheckBox:
+                    id: cb7
+                    on_active: root.set_active(self, 7)
+                Label:
+                Label:
+
+            BoxLayout:
+                orientation: 'horizontal'
+                padding: 0
+                spacing: 0
+
+                Label:
+                Label:
+                FirstNameButton:
+                    text: root.first_name
+                NameButton:
+                    id: name8_1
+                    on_press: root.toggle_character(self, 8, 1)
+                NameButton:
+                    id: name8_2
+                    on_press: root.toggle_character(self, 8, 2)
+                CheckBox:
+                    id: cb8
+                    on_active: root.set_active(self, 8)
+                Label:
+                Label:
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: 10
+            spacing: 10
+            size_hint: 1, 0.15
+
+            Label:
+            Label:
+            Label:
+                
+            Button:
+                id: next_btn
+                text: 'Next'
+                pos_hint: {'bottom': 0.05}
+                on_press: root.next()
+
+
+<SettingsScreen>:
+
+    userid_input: userid_input
+    firstname_input: firstname_input
+
+    GridLayout:
+        cols: 4
+        padding: 50
+        spacing: 50
+        row_force_default: True
+        row_default_height: 40
+
+        canvas.before:
+            Color:
+                rgb: .7, .8, .9
+            Rectangle:
+                size: self.size
+                source: 'data/background.png'
+
+        Label:
+        Label:
+            text: "user"
+        ChineseTextInput:
+            id: userid_input
+            text: root.session['userid']
+            multiline: False
+            on_text_validate: root.on_change_user(self.text)
+        Label:
+            text: "(Enter to change)"
+
+        Label:
+        ChineseLabel:
+            text: unicode("姓")
+        ChineseTextInput:
+            id: firstname_input
+            text: unicode(root.setting['first_name'])
+            input_type: 'text'
+            multiline: False
+        Label:
+
+        Label:
+        Label:
+        Label:
+        Button:
+            text: 'OK'
+            on_press: root.change_setting(); root.manager.current = 'names'
+
+
+<CandidatesScreen>:
+
+    GridLayout:
+        cols: 4
+        padding: 5
+        spacing: 5
+        canvas.before:
+            Color:
+                rgb: .7, .8, .9
+            Rectangle:
+                size: self.size
+                source: 'data/background.png'
+
+        CandidateLabel:
+            id: candidate_label1
+            text: root.candidates[0] if len(root.candidates)>=1 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label1.text)
+        CandidateLabel:
+            id: candidate_label2
+            text: root.candidates[1] if len(root.candidates)>=2 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label2.text)
+        CandidateLabel:
+            id: candidate_label3
+            text: root.candidates[2] if len(root.candidates)>=3 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label3.text)
+        CandidateLabel:
+            id: candidate_label4
+            text: root.candidates[3] if len(root.candidates)>=4 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label4.text)
+        CandidateLabel:
+            id: candidate_label5
+            text: root.candidates[4] if len(root.candidates)>=5 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label5.text)
+        CandidateLabel:
+            id: candidate_label6
+            text: root.candidates[5] if len(root.candidates)>=6 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label6.text)
+        CandidateLabel:
+            id: candidate_label7
+            text: root.candidates[6] if len(root.candidates)>=7 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label7.text)
+        CandidateLabel:
+            id: candidate_label8
+            text: root.candidates[7] if len(root.candidates)>=8 else "" 
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label8.text)
+        CandidateLabel:
+            id: candidate_label9
+            text: root.candidates[8] if len(root.candidates)>=9 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label9.text)
+        CandidateLabel:
+            id: candidate_label10
+            text: root.candidates[9] if len(root.candidates)>=10 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label10.text)
+        CandidateLabel:
+            id: candidate_label11
+            text: root.candidates[10] if len(root.candidates)>=11 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label11.text)
+        CandidateLabel:
+            id: candidate_label12
+            text: root.candidates[11] if len(root.candidates)>=12 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label12.text)
+        CandidateLabel:
+            id: candidate_label13
+            text: root.candidates[12] if len(root.candidates)>=13 else ""
+        RemoveButton:
+            text: "remove"
+            on_press: root.remove_candidate(candidate_label13.text)
+        CandidateLabel:
+            id: candidate_label14
+            text: root.candidates[13] if len(root.candidates)>=14 else ""
+        RemoveButton:
+            on_press: root.remove_candidate(candidate_label14.text)
+
+
+        ChineseTextInput:
+            id: add_candidate_input
+        Button:
+            text: "add"
+            on_press: root.add_candidate(add_candidate_input.text)
+        Label:
+
+        Button:
+            text: 'Back'
+            on_press: root.manager.current = 'names'
+            width: 50
+            pos_hint: {'bottom': 0.95}
