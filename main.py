@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 #-*- coding=utf-8 -*-
+# LIU Yang, gloolar@gmail.com
 
 import kivy
 kivy.require('1.8.0')
