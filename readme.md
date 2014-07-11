@@ -20,7 +20,10 @@ tested under Python 2.7 and [kivy 1.8.0](http://kivy.org/).
 
 # Usage
 
-main.py is the main file for kivy
+- main.py is the entry file for kivy
+- babyname.py is the module dealing with baby name generation, feedback by choice, setting, user management, etc.
+- character_tool.py is the module for preprocessing texts
+
 
 # todo
 
