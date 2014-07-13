@@ -64,15 +64,9 @@ class NamesScreen(Screen):
 
         self.first_name = self.babyname.setting['first_name']
 
-    def next(self):
-
-        # get choices
-        self.babyname.adjust_by_choices(self.choices)
-        candidates_screen.candidates = [settings_screen.setting['first_name']+name for name in list(self.babyname.candidates)]
-
-        ####
-
-        # reset button states
+    def reset_screen(self):
+    	
+    	# reset button states
         for i in range(1,9):
             cb = getattr(self, 'checkbox'+str(i))
             cb.disabled = False
@@ -98,6 +92,13 @@ class NamesScreen(Screen):
         self.choices['name_deny'] = copy.deepcopy(self.options)
         self.choices['character_deny'] = []
 
+
+    def next(self):
+
+        self.babyname.adjust_by_choices(self.choices)
+        candidates_screen.candidates = [settings_screen.setting['first_name']+name for name in list(self.babyname.candidates)]
+        self.reset_screen()
+        
 
     def set_active(self, cb, index):
         # print "options: %d" % len(self.options)
@@ -173,6 +174,7 @@ class SettingsScreen(Screen):
             names_screen.first_name = self.setting['first_name']
 
             self.firstname_input.text = self.setting['first_name']
+            names_screen.reset_screen()
 
 
     def change_setting(self):
@@ -184,6 +186,8 @@ class SettingsScreen(Screen):
             names_screen.babyname.change_setting('first_name', self.firstname_input.text)
             self.setting['first_name'] = names_screen.babyname.setting['first_name']
             names_screen.first_name = self.setting['first_name']
+
+            names_screen.reset_screen()
 
 
 class CandidatesScreen(Screen):
