@@ -1,13 +1,12 @@
 # Baby naming
 
-Select a Chinese name for my baby. 
+The app is developed for the purpose of naming my forthcoming baby ^_^ Strongly wish it works!
 
-No "八字"! No "五行"! No "运势"! No "星座"!
+# Features:
 
-Features:
-
+- No "八字"! No "五行"! No "运势"! No "星座"! No such shit!
 - Characters are chosen from (famous) texts. You can add your own texts.
-	- current support texts: "国风", "大雅", "小雅", "颂", "古诗十九首", "九歌", "离骚", "苏武李陵诗", "天问", "王维", "唐诗三百首", "李商隐诗选", "李煜词全集", "苏轼词选", "陶渊明文选", "兰亭集序", "前后赤壁赋", "滕王阁序"
+	- current supported texts: "国风", "大雅", "小雅", "颂", "古诗十九首", "九歌", "离骚", "苏武李陵诗", "天问", "王维", "唐诗三百首", "李商隐诗选", "李煜词全集", "苏轼词选", "陶渊明文选", "兰亭集序", "前后赤壁赋", "滕王阁序"
 - Names are generated and what you need to do is just selecting those you prefer.
 - Suggest names based on your preferrd names.
 - Random names are also given in the options and a surprise is expected.
