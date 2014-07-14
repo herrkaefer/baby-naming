@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 #-*- coding=utf-8 -*-
+# Copyright 2014 LIU Yang <gloolar@gmail.com>
 
 import sys
 import random

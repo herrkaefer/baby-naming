@@ -1,6 +1,6 @@
 #!/usr/bin/env python 
 #-*- coding=utf-8 -*-
-# LIU Yang, gloolar@gmail.com
+# Copyright 2014 LIU Yang <gloolar@gmail.com>
 
 
 import marshal
