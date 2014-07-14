@@ -2,7 +2,7 @@
 
 The app is developed for the purpose of naming my forthcoming baby ^_^ Strongly wish it works!
 
-# Features:
+# Features
 
 - No "八字"! No "五行"! No "运势"! No "星座"! No such shit!
 - Characters are chosen from (famous) texts. You can add your own texts.
@@ -19,10 +19,29 @@ tested under Python 2.7 and [kivy 1.8.0](http://kivy.org/).
 
 # Usage
 
-- main.py is the entry file for kivy
+- main.py is the entry file for kivy.
+
+on mac:
+```
+# switch to the app directory
+kivy main.py
+```
+
+on Windows:
+```
+# run kivy.bat
+# switch to the app directory
+python main.py
+```
 - babyname.py is the module dealing with baby name generation, feedback by choice, setting, user management, etc.
 - character_tool.py is the module for preprocessing texts
 
+txt texts should be processed before using by babyname.py. To add a txt:
+
+- put txt file in data/txt and encoded with "gbk" or "gb2312".
+- in "character_tool.py", modify variable all_text_files to add your text.
+- run "python character_tool.py"
+- in "babyname.py", modify default_setting['selected_texts'] in class BabyName to include the texts you want to use.
 
 # todo
 
