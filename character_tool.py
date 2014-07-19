@@ -2,8 +2,8 @@
 #-*- coding=utf-8 -*-
 # Copyright 2014 LIU Yang <gloolar@gmail.com>
 
-
 import marshal
+import os
 
 all_text_files = {	u"国风": 'guofeng.txt', 
 					u"大雅": 'guofeng.txt', 
@@ -37,30 +37,31 @@ def load_char_table_from_text_file(text_file, coding='gbk', context_length=6):
 	if not text_file in all_text_files:
 		return char_table
 
-	filename = all_text_files[text_file]
-	text = open("data/txt/"+filename).read().decode(coding).splitlines()
-	
-	for line in text:
-		for d in delimiters:
-			line = line.replace(d, '*')
-		# print line
-		line = line.split('*')
+	filename = os.path.join(os.getcwd(), "data/txt/", all_text_files[text_file])
+	if os.path.isfile(filename):
+		text = open(filename).read().decode(coding).splitlines()
 		
-		for phrase in line:
-			phrase_c = to_chinese(phrase)
-			# print phrase_c + " -- "
+		for line in text:
+			for d in delimiters:
+				line = line.replace(d, '*')
+			# print line
+			line = line.split('*')
+			
+			for phrase in line:
+				phrase_c = to_chinese(phrase)
+				# print phrase_c + " -- "
 
-			for index, char in enumerate(phrase_c):
+				for index, char in enumerate(phrase_c):
 
-				if is_chinese(char):
-					if not char in char_table.keys(): # new character
-						char_table[char] = {'context':[], 'rating':0, 'tabu':set()}
-					
-					# grab context in text
-					context_start = max(0, index - context_length)
-					context_end = min(len(phrase_c), index + context_length + 1)
-					char_table[char]['context'].append({'content':   phrase_c[context_start:context_end],
-														'belongsto': text_file })
+					if is_chinese(char):
+						if not char in char_table.keys(): # new character
+							char_table[char] = {'context':[], 'rating':0, 'tabu':set()}
+						
+						# grab context in text
+						context_start = max(0, index - context_length)
+						context_end = min(len(phrase_c), index + context_length + 1)
+						char_table[char]['context'].append({'content':   phrase_c[context_start:context_end],
+															'belongsto': text_file })
 
 	return char_table
 
@@ -79,11 +80,14 @@ def process_text_files(text_files=all_text_files.keys(), context_length=6):
 
 		if len(char_table) > 0:
 			# save char_table to disk
-			filename = all_text_files[file]
-			ouf = open("data/text/"+filename[:-4]+'.dat', 'wb')
-			marshal.dump(file, ouf)
-			marshal.dump(char_table, ouf)		
-			ouf.close()
+			txtfile = all_text_files[file]
+			datfile = os.path.join(os.getcwd(), "data/text/", txtfile[:-4]+'.dat')
+			ouf = open(datfile, 'wb')
+			try:
+				marshal.dump(file, ouf)
+				marshal.dump(char_table, ouf)
+			finally:
+				ouf.close()
 
 
 def load_original_char_table(selected_files=all_text_files.keys()):
@@ -99,19 +103,21 @@ def load_original_char_table(selected_files=all_text_files.keys()):
 
 		print "load %s" % file
 
-		filename = all_text_files[file]
-		inf = open("data/text/"+filename[:-4]+'.dat', 'rb')
-		text_title = marshal.load(inf)
-		new_char_table = marshal.load(inf)
+		txtfile = all_text_files[file]
+		datfile = os.path.join(os.getcwd(), "data/text/", txtfile[:-4]+'.dat')
+		inf = open(datfile, 'rb')
+		try:
+			text_title = marshal.load(inf)
+			new_char_table = marshal.load(inf)
 
-		# merge new_char_table to char_table
-		for key, value in new_char_table.items():
-			if char_table.has_key(key):
-				char_table[key]['context'] += value['context']
-			else:
-				char_table[key] = value
-
-		inf.close()
+			# merge new_char_table to char_table
+			for key, value in new_char_table.items():
+				if char_table.has_key(key):
+					char_table[key]['context'] += value['context']
+				else:
+					char_table[key] = value
+		finally:
+			inf.close()
 
 	return char_table
 
@@ -136,6 +142,7 @@ def to_chinese(ustring):
 		# elif char==u"\n":
 		# 	print "period!"
 	return re_string
+
 
 def print_char_table(char_table):
 

@@ -10,7 +10,7 @@ import os.path
 
 import character_tool
 
-reload(character_tool)
+# reload(character_tool)
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -19,14 +19,15 @@ class BabyName(object):
 
 	setting = {'selected_texts':[], 'first_name':"", 'min_len':1, 'max_len':2, 'duplication':'y', 'num_option':4, 'max_candidate':10}
 	session = {'userid':"", 'username': ""}
+	candidates = set()
+	char_table = {}
+
 	default_session = {'userid':"guest", 'username': 'guest'}
 	
 	# default setting for new user
 	default_setting = {'selected_texts':character_tool.all_text_files.keys(), 'first_name':u"刘", 'min_len':2, 'max_len':2, 'duplication':'y', 'num_option':8, 'max_candidate':10}
 	default_setting['selected_texts'] = [u"王维", u"唐诗三百首", u"李商隐诗选", u"李煜词全集", u"苏轼词选", u"陶渊明文选", u"兰亭集序", u"前后赤壁赋", u"滕王阁序"]
 	
-	candidates = set()
-	char_table = {}
 
 	def __init__(self):
 		pass
@@ -35,14 +36,14 @@ class BabyName(object):
 	def load_default_session(self):
 		self.setting = self.default_setting
 		self.session = self.default_session
-		self.candidates = set()
+		self.candidates.clear()
 		self.load_char_table(self.setting['selected_texts'])
 
 
 	def load_last_session(self):
-		lsfile = 'data/session/ls'
-		if os.path.isfile(lsfile):
-			inf = open(lsfile, 'rb')
+		ls_file = os.path.join(os.getcwd(), "data/session/ls")
+		if os.path.isfile(ls_file):
+			inf = open(ls_file, 'rb')
 			try:
 				last_userid = marshal.load(inf)
 				if not self.load_session(last_userid):
@@ -55,21 +56,11 @@ class BabyName(object):
 			self.load_default_session()
 
 
-	def create_new_user(self, userid):
-		self.setting = self.default_setting
-		# self.setting['selected_texts'] = character_tool.all_text_files.keys()
-		# self.setting['selected_texts'] = [u'苏轼词选']
-		self.session['userid'] = userid
-		self.session['username'] = userid
-		self.candidates = set()
-		self.load_char_table(self.setting['selected_texts'])
-		print "new user created for %s" % self.session['userid']
-
-
 	def load_session(self, userid):
-		filename = "data/session/" + userid
-		if os.path.isfile(filename):
-			inf = open(filename, 'rb')
+		user_file = os.path.join(os.getcwd(), "data/session/", userid)
+
+		if os.path.isfile(user_file):
+			inf = open(user_file, 'rb')
 			try:
 				self.session = marshal.load(inf)
 				self.setting = marshal.load(inf)
@@ -84,7 +75,8 @@ class BabyName(object):
 
 
 	def save_session(self):
-		ouf = open("data/session/"+self.session['userid'], 'wb')
+		user_file = os.path.join(os.getcwd(), "data/session/", self.session['userid'])
+		ouf = open(user_file, 'wb')
 		try:
 			marshal.dump(self.session, ouf)
 			marshal.dump(self.setting, ouf)
@@ -94,26 +86,58 @@ class BabyName(object):
 			ouf.close()
 
 		# save current userid separately
-		ouf = open("data/session/ls", 'wb')
+		ls_file = os.path.join(os.getcwd(), "data/session/ls")
+		ouf = open(ls_file, 'wb')
 		try:
 			marshal.dump(self.session['userid'], ouf)
 		finally:
 			ouf.close()
 
-		print "session saved for user %s" % self.session['userid']
+		# print "session saved for user %s" % self.session['userid']
 
 
 	def quit(self):
 		self.save_session()
 
 
-	def change_user(self, userid):
-		if userid == self.session['userid']:
-			return
+	def create_new_user(self, userid, username=None):
+		self.setting = self.default_setting
+		self.session['userid'] = userid
+		if username == None:
+			self.session['username'] = userid
 		else:
+			self.session['username'] = username
+		self.candidates.clear()
+		self.load_char_table(self.setting['selected_texts'])
+		print "new user created for %s" % self.session['userid']
+
+
+	def change_user(self, userid):
+		if userid != self.session['userid']:
 			self.save_session()
 			if not self.load_session(userid):
 				self.create_new_user(userid)
+				self.save_session()
+
+
+	def reset_user(self, userid=None):
+		if userid == None:
+			userid = self.session['userid']
+		self.create_new_user(userid)
+		self.save_session()
+
+
+	def delete_user(self, userid=None):
+		if userid == None:
+			userid = self.session['userid']
+		if userid != 'guest':
+			self.change_user('guest')
+			user_file = "data/session/" + userid
+			if os.path.isfile(user_file):
+				try:
+					os.remove(user_file)
+				except OSError:
+					pass
 
 
 	def change_setting(self, key, value):
@@ -125,8 +149,10 @@ class BabyName(object):
 		"""Load char_table from pre-stored char_tables"""
 		self.char_table = character_tool.load_original_char_table(selected_texts)
 
+
 	def get_available_texts(self):
 		return character_tool.all_text_files.keys()
+
 
 	def generate_options(self, num=1):
 		"""Generate num group of options"""
