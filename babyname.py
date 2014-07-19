@@ -17,12 +17,20 @@ sys.setdefaultencoding("utf-8")
 
 class BabyName(object):
 
-	setting = {'selected_texts':[], 'first_name':"", 'min_len':1, 'max_len':2, 'duplication':'y', 'num_option':4, 'max_candidate':10}
+	setting = { 'selected_texts': [], 
+				'first_name':     "",
+				'min_len':        1,
+				'max_len':        2,
+				'duplication':    'y',
+				'num_option':     4,
+				'max_candidate':  10
+			  }
+
 	session = {'userid':"", 'username': ""}
 	candidates = set()
 	char_table = {}
 
-	default_session = {'userid':"guest", 'username': 'guest'}
+	default_session = {'userid': "guest", 'username': 'guest'}
 	
 	# default setting for new user
 	default_setting = {'selected_texts':character_tool.all_text_files.keys(), 'first_name':u"刘", 'min_len':2, 'max_len':2, 'duplication':'y', 'num_option':8, 'max_candidate':10}
@@ -200,7 +208,6 @@ class BabyName(object):
 
 			options.append(group)
 
-
 		return options
 
 
@@ -300,6 +307,7 @@ class BabyName(object):
 
 
 	def generate_suggestions(self, num_exp=1):
+		"""Suggest names based on candidates"""
 
 		given_names = []
 
@@ -399,9 +407,6 @@ class BabyName(object):
 		return given_names
 
 
-
-
-
 	def generate_new_faces(self, num=1):
 		"""Generate new name randomly"""
 
@@ -460,24 +465,35 @@ class BabyName(object):
 	def add_characters(self, chars):
 		"""directly (mannually) add characters (or remove them from tabu list)"""
 		for ch in chars:
-			if self.char_table['ch']['rating'] < 0:
-				self.char_table['ch']['rating'] = 0
+			if ch in self.char_table.keys():
+				if self.char_table[ch]['rating'] < 0:
+					self.char_table[ch]['rating'] = 0
+			else: # character not in char_table
+				self.char_table[ch] = {'context':[], 'rating':0, 'tabu':set()}
 
 
 	def remove_characters(self, chars):
-		"""directly (mannually) add characters to tabu list"""
+		"""directly (mannually) taboo characters"""
 		for ch in chars:
-			if self.char_table['ch']['rating'] >= 0:
-				self.char_table['ch']['rating'] = -1
-			# remove candidates including ch
-			candidates_include_ch = [name for name in self.candidates if ch in name]
-			self.remove_candidates(candidates_include_ch)
+			if ch in self.char_table.keys():
+				if self.char_table[ch]['rating'] >= 0:
+					self.char_table[ch]['rating'] = -1
+				# remove candidates including ch
+				candidates_include_ch = [name for name in self.candidates if ch in name]
+				self.remove_candidates(candidates_include_ch)
+			else:
+				self.char_table[ch] = {'context':[], 'rating':-1, 'tabu':set()}
 
+
+	def get_tabu_characters(self):
+		"""get list of tabooed characters"""
+		return [ch for ch in self.char_table.keys() if self.char_table[ch]['rating'] < 0] 
 
 
 	def adjust_by_choices(self, choices):
 		"""Adjust model based on selection result
 		choices := {'name_prefer': [], 'name_deny': [], 'character_deny': []}
+		name is given name
 		"""
 
 		# denied characters
@@ -489,7 +505,7 @@ class BabyName(object):
 
 		# denied names with length > 1
 		for name in choices['name_deny']:
-			for index, ch in enumerate(name[:-1]): # for those len(name)>1
+			for index, ch in enumerate(name[:-1]):
 				self.char_table[ch]['tabu'].add(name[index+1])
 
 		self.candidates -= set(choices['name_deny'])
@@ -504,6 +520,7 @@ class BabyName(object):
 
 	def print_char_table(self):
 		character_tool.print_char_table(self.char_table)
+
 
 	def print_candidates(self):
 		print "\nCurrent candidates: %s" % " ".join(self.candidates)
