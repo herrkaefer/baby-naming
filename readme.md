@@ -42,6 +42,10 @@ on Windows:
 - run "python character_tool.py"
 - in "babyname.py", modify default_setting['selected_texts'] in class BabyName to include the texts you want to use.
 
+# Packaging
+
+refer to [Kivy Packaging](http://kivy.org/docs/gettingstarted/packaging.html)
+
 # todo
 
 - add data support

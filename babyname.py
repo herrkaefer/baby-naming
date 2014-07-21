@@ -420,11 +420,10 @@ class BabyName(object):
 			else:
 				len_name = random.randint(self.setting['min_len'], self.setting['max_len'])
 
-			# cnt = 1
-			# loop_cnt = 0
-			while len(given_name) < len_name:# and loop_cnt < 100:
-				# loop_cnt += 1
-				# print "====char_table length: %d" % len(self.char_table)
+			loop_cnt = 0
+			while len(given_name) < len_name and loop_cnt < 100:
+				loop_cnt += 1
+
 				if len(given_name) > 0:
 					feasible_chs = [ch for ch in self.char_table.keys() if self.is_feasible(given_name[-1], ch)]
 				else:
@@ -432,11 +431,7 @@ class BabyName(object):
 
 				if len(feasible_chs) > 0:
 					ch = random.choice(feasible_chs)
-				# if self.char_table[ch]['rating'] >= 0:
-				# 	if cnt >= 2 and (not self.is_feasible(given_name[-1], ch)):
-				# 		continue
 					given_name += ch
-					# cnt += 1
 				elif len(given_name) > 0:
 					given_name = given_name[:-1] # remove the last character to set another one
 				else:
