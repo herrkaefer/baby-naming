@@ -64,6 +64,7 @@ class NamesScreen(Screen):
 
         self.first_name = self.babyname.setting['first_name']
 
+
     def reset_screen(self):
     	
     	# reset button states
@@ -122,10 +123,10 @@ class NamesScreen(Screen):
 
     def toggle_character(self, btn, index1, index2):
         print "button %d-%d is toggled." % (index1, index2)
+
         if btn.state == 'down':
             # deal with meanings
-            print len(self.options)
-            print self.options[index1-1]
+            print self.options[index1-1][index2-1]
             if not self.options[index1-1][index2-1] in self.choices['character_deny']:
                 self.choices['character_deny'].append(self.options[index1-1][index2-1])
             if self.options[index1-1] in self.choices["name_prefer"]:
@@ -152,11 +153,22 @@ class NamesScreen(Screen):
                     cb.disabled = False
 
 
+    def toggle_all_characters_in_name(self, index):
+        btn1 = getattr(self, "char"+str(index)+"_1")
+        btn2 = getattr(self, "char"+str(index)+"_2")
+
+        btn1.state = 'down'
+        self.toggle_character(btn1, index, 0)
+        btn2.state = 'down'
+        self.toggle_character(btn2, index, 1)
+
+
     
 class SettingsScreen(Screen):
     
     userid_input = ObjectProperty()
     firstname_input = ObjectProperty()
+    cb_duplication = ObjectProperty()
 
     setting = DictProperty({'selected_texts':[], 'first_name':"", 'min_len':1, 'max_len':2, 'duplication':'y', 'num_option':4, 'max_candidate':10})
     session = DictProperty({'userid': "", 'username': ""})
@@ -173,26 +185,48 @@ class SettingsScreen(Screen):
             candidates_screen.candidates = [settings_screen.setting['first_name']+name for name in list(names_screen.babyname.candidates)]
             names_screen.first_name = self.setting['first_name']
 
-            self.firstname_input.text = self.setting['first_name']
+            settings_screen.reset_screen()
             names_screen.reset_screen()
 
 
     def change_setting(self):
+        """on OK button pressed"""
 
         print "change_setting called."
+
+        setting_changed = False
         
-        # check all settings
+        # check all settings except userid
         if self.firstname_input.text != self.setting['first_name']:
+            setting_changed = True
+
             names_screen.babyname.change_setting('first_name', self.firstname_input.text)
             self.setting['first_name'] = names_screen.babyname.setting['first_name']
             names_screen.first_name = self.setting['first_name']
 
+        if self.cb_duplication.active:
+            dup = 'y'
+        else:
+            dup = 'n'
+        if dup != self.setting['duplication']:
+            print "here!"
+            setting_changed = True
+            names_screen.babyname.change_setting('duplication', dup)
+            self.setting['duplication'] = names_screen.babyname.setting['duplication']
+
+
+        if setting_changed:
             names_screen.reset_screen()
+
+
+    def reset_screen(self):
+        self.firstname_input.text = self.setting['first_name']
+        self.cb_duplication.active = True if self.setting['duplication'] else False
 
 
 class CandidatesScreen(Screen):
 
-    candidates = ListProperty([]*10)
+    candidates = ListProperty([]*14)
 
     def remove_candidate(self, name):
         given_names = [name.lstrip(settings_screen.setting['first_name'])]
@@ -224,7 +258,8 @@ class NamerApp(App):
     def build(self):
         self.icon = 'babynaming.ico'
         names_screen.initial_babyname()
-        names_screen.next()
+        names_screen.reset_screen()
+        settings_screen.reset_screen()
 
         return sm
 

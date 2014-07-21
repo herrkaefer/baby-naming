@@ -109,6 +109,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(1)
                 NameButton:
                     id: name1_1
                     on_press: 
@@ -131,6 +132,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(2)
                 NameButton:
                     id: name2_1
                     on_press: root.toggle_character(self, 2, 1)
@@ -152,6 +154,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(3)
                 NameButton:
                     id: name3_1
                     on_press: root.toggle_character(self, 3, 1)
@@ -173,6 +176,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(4)
                 NameButton:
                     id: name4_1
                     on_press: root.toggle_character(self, 4, 1)
@@ -194,6 +198,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(5)
                 NameButton:
                     id: name5_1
                     on_press: root.toggle_character(self, 5, 1)
@@ -215,6 +220,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(6)
                 NameButton:
                     id: name6_1
                     on_press: root.toggle_character(self, 6, 1)
@@ -236,6 +242,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(7)
                 NameButton:
                     id: name7_1
                     on_press: root.toggle_character(self, 7, 1)
@@ -257,6 +264,7 @@
                 Label:
                 FirstNameButton:
                     text: root.first_name
+                    on_press: root.toggle_all_characters_in_name(8)
                 NameButton:
                     id: name8_1
                     on_press: root.toggle_character(self, 8, 1)
@@ -291,9 +299,10 @@
 
     userid_input: userid_input
     firstname_input: firstname_input
+    cb_duplication: cb_duplication
 
     GridLayout:
-        cols: 4
+        cols: 3
         padding: 50
         spacing: 50
         row_force_default: True
@@ -307,7 +316,6 @@
                 source: 'data/background.png'
 
         Label:
-        Label:
             text: "user"
         ChineseTextInput:
             id: userid_input
@@ -315,9 +323,11 @@
             multiline: False
             on_text_validate: root.on_change_user(self.text)
         Label:
-            text: "(Enter to change)"
+            font_name: 'kaiti.ttf'
+            font_size: 20
+            text: "<--编辑后按回车"
 
-        Label:
+
         ChineseLabel:
             text: unicode("姓")
         ChineseTextInput:
@@ -326,8 +336,17 @@
             input_type: 'text'
             multiline: False
         Label:
+            font_name: 'kaiti.ttf'
+            font_size: 20
+            text: "中文请粘贴, sorry!"
 
+        ChineseLabel:
+            text: unicode("是否允许叠字")
+        CheckBox:
+            id: cb_duplication
         Label:
+            
+
         Label:
         Label:
         Button:
