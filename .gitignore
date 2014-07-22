@@ -1,5 +1,5 @@
-baby_naming_design.md
-chinese_tool.*
 *.pyc
 dist/
 data/session/*
+doc/
+bak/

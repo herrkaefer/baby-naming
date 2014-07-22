@@ -7,6 +7,7 @@ import random
 import re
 import marshal
 import os.path
+import copy
 
 import character_tool
 
@@ -31,10 +32,19 @@ class BabyName(object):
 	char_table = {}
 
 	default_session = {'userid': "guest", 'username': 'guest'}
+
+	default_selected_texts = [u"王维", u"唐诗三百首", u"李商隐诗选", u"李煜词全集", u"苏轼词选", u"陶渊明文选", u"兰亭集序", u"前后赤壁赋", u"滕王阁序"]
 	
 	# default setting for new user
-	default_setting = {'selected_texts':character_tool.all_text_files.keys(), 'first_name':u"刘", 'min_len':2, 'max_len':2, 'duplication':'y', 'num_option':8, 'max_candidate':10}
-	default_setting['selected_texts'] = [u"王维", u"唐诗三百首", u"李商隐诗选", u"李煜词全集", u"苏轼词选", u"陶渊明文选", u"兰亭集序", u"前后赤壁赋", u"滕王阁序"]
+	default_setting = { 'selected_texts': default_selected_texts,
+						'first_name':     u"刘",
+						'min_len':        2,
+						'max_len':        2,
+						'duplication':    'y',
+						'num_option':     8,
+						'max_candidate':  10
+					  }
+
 	
 
 	def __init__(self):
@@ -151,6 +161,15 @@ class BabyName(object):
 	def change_setting(self, key, value):
 		if key in self.setting.keys():
 			self.setting[key] = value
+
+			if key == "selected_texts":
+				# update char_table, and transfer the tabooed characters and names to the new char_table
+				old_char_table = self.char_table
+				self.load_char_table(self.setting['selected_texts'])
+				for ch in self.char_table.keys():
+					if ch in old_char_table.keys():
+						self.char_table[ch]['rating'] = copy.copy(old_char_table[ch]['rating'])
+						self.char_table[ch]['tabu'] = copy.copy(old_char_table[ch]['tabu'])
 
 
 	def load_char_table(self, selected_texts):
