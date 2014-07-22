@@ -300,9 +300,11 @@
     userid_input: userid_input
     firstname_input: firstname_input
     cb_duplication: cb_duplication
+    min_len_input: min_len_input
+    max_len_input: max_len_input
 
     GridLayout:
-        cols: 3
+        cols: 4
         padding: 50
         spacing: 50
         row_force_default: True
@@ -326,27 +328,44 @@
             font_name: 'kaiti.ttf'
             font_size: 20
             text: "<--编辑后按回车"
+        Label:
 
 
         ChineseLabel:
             text: unicode("姓")
         ChineseTextInput:
             id: firstname_input
-            text: unicode(root.setting['first_name'])
             input_type: 'text'
             multiline: False
         Label:
             font_name: 'kaiti.ttf'
             font_size: 20
             text: "中文请粘贴, sorry!"
+        Label:
 
+
+        ChineseLabel:
+            text: unicode("名字最小字数")
+        TextInput:
+            id: min_len_input
+            input_type: 'number'
+
+        ChineseLabel:
+            text: unicode("名字最多字数")
+        TextInput:
+            id: max_len_input
+            input_type: 'number'
+
+        
         ChineseLabel:
             text: unicode("是否允许叠字")
         CheckBox:
             id: cb_duplication
         Label:
-            
+        Label:
 
+
+        Label:
         Label:
         Label:
         Button:

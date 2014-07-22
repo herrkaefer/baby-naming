@@ -9,6 +9,8 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty, DictProperty, ListProperty, StringProperty
+# from kivy.adapters.listadapter import ListAdapter
+# from kivy.uix.listview import ListItemButton, ListView
 
 import copy
 
@@ -169,6 +171,8 @@ class SettingsScreen(Screen):
     userid_input = ObjectProperty()
     firstname_input = ObjectProperty()
     cb_duplication = ObjectProperty()
+    min_len_input = ObjectProperty()
+    max_len_input = ObjectProperty()
 
     setting = DictProperty({'selected_texts':[], 'first_name':"", 'min_len':1, 'max_len':2, 'duplication':'y', 'num_option':4, 'max_candidate':10})
     session = DictProperty({'userid': "", 'username': ""})
@@ -214,6 +218,13 @@ class SettingsScreen(Screen):
             names_screen.babyname.change_setting('duplication', dup)
             self.setting['duplication'] = names_screen.babyname.setting['duplication']
 
+        if self.min_len_input.text != self.setting['min_len'] or self.max_len_input.text != self.setting['max_len']:
+            if 1 <= int(self.min_len_input.text) <= int(self.max_len_input.text) <= 2:
+                setting_changed = True
+                names_screen.babyname.change_setting('min_len', int(self.min_len_input.text))
+                names_screen.babyname.change_setting('max_len', int(self.max_len_input.text))
+            else:
+                print "invalid input for name length setting"
 
         if setting_changed:
             names_screen.reset_screen()
@@ -222,6 +233,8 @@ class SettingsScreen(Screen):
     def reset_screen(self):
         self.firstname_input.text = self.setting['first_name']
         self.cb_duplication.active = True if self.setting['duplication'] else False
+        self.min_len_input.text = str(self.setting['min_len'])
+        self.max_len_input.text = str(self.setting['max_len'])
 
 
 class CandidatesScreen(Screen):
