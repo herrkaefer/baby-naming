@@ -8,6 +8,7 @@ import re
 import marshal
 import os.path
 import copy
+import math
 
 import character_tool
 
@@ -189,23 +190,23 @@ class BabyName(object):
 		for i in range(num):
 			group = []
 
-			# past winners
-			if len(self.candidates) >= self.setting['max_candidate']:
-				num_exp = min(2, self.setting['num_option']/3)
-				past_winners = self.generate_past_winners(num_exp)
-				group.extend(past_winners)
-			else:
-				num_exp = 0
-				past_winners = []
+			# # past winners
+			# if len(self.candidates) >= self.setting['max_candidate']:
+			# 	num_exp = min(2, self.setting['num_option']/3)
+			# 	past_winners = self.generate_past_winners(num_exp)
+			# 	group.extend(past_winners)
+			# else:
+			# 	num_exp = 0
+			# 	past_winners = []
 
-			print "\npast winners: %s" % " ".join(past_winners)
+			# print "\npast winners: %s" % " ".join(past_winners)
 
 			# suggestions based on self.candidates
 			num_exp = (self.setting['num_option'] - len(group)) / 2
-			suggested = self.generate_suggestions(num_exp)
+			suggested = self.generate_suggestions_from_candidates(num_exp)
 			group.extend(suggested)
 
-			print "suggested: %s" % " ".join(suggested)
+			print "suggested from candidates: %s" % " ".join(suggested)
 
 			# random suggestions
 			num_exp = (self.setting['num_option'] - len(group)) / 2
@@ -260,7 +261,7 @@ class BabyName(object):
 			"second": ch as the second character
 		"""
 
-		if not ch in self.char_table.keys():
+		if not self.char_table.get(ch):
 			return []
 			
 		context = random.choice(self.char_table[ch]['context'])
@@ -274,12 +275,14 @@ class BabyName(object):
 			
 		distance = range(radius)
 		
-		fitness = [1.0/(d+len(distance)+1) for d in distance]
+		# fitness = [1.0/(d+len(distance)+1) for d in distance]
+		fitness = [math.exp(-d) for d in distance]
+
 		# adjust the fitness of ch itself
 		if self.setting['duplication'] == 'n':
 			fitness[0] = 0
 		else:
-			fitness[0] = fitness[-1]*0.2
+			fitness[0] = min(fitness)*0.25
 
 		# roulette wheel selection
 		sum_fitness = sum(fitness)
@@ -293,53 +296,44 @@ class BabyName(object):
 		# print "selected: %d, %d" % (index, d)
 
 		left = random.randint(0,1) # going left or right from ch?
-		if left == 0 and (index_ch-d) >= 0:
+		if left < 0.3 and (index_ch-d) >= 0: # probability of going left is small
 			new_ch = content[index_ch-d]
-		elif index_ch+d < len(content):
+		elif index_ch+d < len(content): # going right
 			new_ch = content[index_ch+d]
 		else:
 			new_ch = ''
 
+		pair = []
 		if len(new_ch) > 0:
-			if position == "both":
-				pair = [ch, new_ch]
-				random.shuffle(pair)
-				if not self.is_feasible(pair[0], pair[1]):
+			pair = [ch, new_ch]
+			
+			if not self.is_feasible(pair[0], pair[1]):
+				if position == "first":
+					pair = []
+				else:
 					pair.reverse()
 					if not self.is_feasible(pair[0], pair[1]):
 						pair = []
 
-			elif position == "first":
-				pair = [ch, new_ch]
-				if not self.is_feasible(pair[0], pair[1]):
-					pair = []
-
-			else:
-				pair = [new_ch, ch]
-				if not self.is_feasible(pair[0], pair[1]):
-					pair = []
-		else:
-			pair = []
-        
-		# return {'pair': pair, 'belongsto': belongsto}
 		return pair
 
 
-	def generate_suggestions(self, num_exp=1):
+	def generate_suggestions_from_candidates(self, num_exp=1):
 		"""Suggest names based on candidates"""
 
 		given_names = []
 
 		# choose some different characters in names in self.candidates
 		ch_set = [ch for name in self.candidates for ch in name]
+		# print ch_set
+		ch_set = list(set(ch_set)) # remove duplications
 		random.shuffle(ch_set)
-		ch_set = set(ch_set)
 		num = min(num_exp, len(ch_set))
-		chs = list(ch_set)[:num]
+		chs = ch_set[:num]
 
 		# if given name length is fixed to 1
 		if self.setting['min_len'] == 1 and self.setting['max_len'] == 1:
-			return chs
+			return [ch for ch in chs if not ch in self.candidates]
 
 		pos_chs = 0
 
@@ -361,7 +355,7 @@ class BabyName(object):
 
 			# first two characters
 			pair = self.roulette_wheel_select(chs[pos_chs], position="both")
-			if pair == []:
+			if len(pair) == 0:
 				pos_chs += 1
 				continue
 			given_name += pair[0]
@@ -371,7 +365,7 @@ class BabyName(object):
 			# if len_name > 2 (seldom in Chinese names)
 			for i in range(len_name-2):
 				pair = self.roulette_wheel_select(lastch, position="first")
-				if pair == []:
+				if len(pair) == 0:
 					break
 				else:
 					given_name += pair[1]
@@ -387,42 +381,56 @@ class BabyName(object):
 
 
 	def generate_random_suggestions(self, num=1):
-		"""Generate random suggestions (characters are somehow related)"""
+		"""Generate random suggestions (pairs) based on context	"""
 		
+		if (self.setting['min_len'] > 2 or self.setting['max_len'] < 2):
+			return []
+
 		given_names = []
+
+		ch_set = [ch for ch in self.char_table.keys() if self.char_table[ch]['rating'] >= 0 and len(self.char_table[ch]['context']) > 0]
+
+		if len(ch_set) == 0:
+			return []
 
 		for i in range(num):
 
 			given_name = ""
-			if (self.setting['min_len'] == self.setting['max_len']):
-				len_name = self.setting['min_len']
-			else:
-				len_name = random.randint(self.setting['min_len'], self.setting['max_len'])
 
-			# random select the first character
-			ch = random.choice(self.char_table.keys())
+			ch = random.choice(ch_set)
+			context = random.choice(self.char_table[ch]['context'])
+			content = context['content']
 
-			# first pair
-			pair = self.roulette_wheel_select(ch, position="both")
-			if pair == []:
-				continue
-			given_name += pair[0]
-			given_name += pair[1]
-			lastch = pair[1]
+			ind = content.index(ch)
+			radius = max(len(content)-ind-1, ind)
 
-			# if len_name > 2 (seldom in Chinese names)
-			for i in range(len_name-2):
-				pair = self.roulette_wheel_select(lastch, position="first")
-				if pair == []:
-					break
-				else:
-					given_name += pair[1]
-					lastch = pair[1]
+			for i in range(1,radius):
 
+				if (ind+i <= len(content)-1) and self.is_feasible(ch, content[ind+i]):
+					given_name = ch + content[ind+i]
+					if not (given_name in self.candidates or given_name in given_names):
+						given_names.append(given_name)
+						break
 
-			if len(given_name) == len_name:
-				given_names.append(given_name)
+				if (ind-i >= 0) and self.is_feasible(content[ind-i], ch):
+					given_name = content[ind-i] + ch
+					if not (given_name in self.candidates or given_name in given_names):
+						given_names.append(given_name)
+						break
 
+				if (ind+i <= len(content)-1) and self.is_feasible(content[ind+i], ch):
+					given_name = content[ind+i] + ch
+					if not (given_name in self.candidates or given_name in given_names):
+						given_names.append(given_name)
+						break
+
+				if (ind-i >= 0) and self.is_feasible(ch, content[ind-i]):
+					given_name = ch + content[ind-i]
+					if not (given_name in self.candidates or given_name in given_names):
+						given_names.append(given_name)
+						break
+
+					
 		return given_names
 
 
