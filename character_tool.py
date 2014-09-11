@@ -5,109 +5,82 @@
 import marshal
 import os
 
-all_text_files = {	u"诗经-国风": 'guofeng.txt', 
-					u"诗经-大雅": 'daya.txt', 
-					u"诗经-小雅": 'xiaoya.txt',
-					u"诗经-颂": 'song.txt',
-					u"古诗十九首": 'gushi19.txt',
-					u"九歌": 'jiuge.txt',
-					u"离骚": 'lisao.txt',
-					u"苏武李陵诗": 'suli.txt',
-					u"天问": 'tianwen.txt',
-					u"王维诗": 'wangwei.txt',
-					u"唐诗三百首": 'tang300.txt',
-					u"李商隐诗选": 'lishangyin.txt',
-					u"李煜词全集": 'liyu.txt',
-					u"苏轼词选": 'sushici.txt',
-					u"苏轼文选": 'sushiwen.txt',
-					u"陶渊明文选": 'taoyuanmingwen.txt',
-					u"陶渊明诗全集": 'taoyuanmingshi.txt',
-					u"兰亭集序": 'lanting.txt',
-					u"滕王阁序": 'tengwang.txt'
-				}
+txt_dir = "data/txt/"
+dat_dir = "data/text/"
 
 
-def load_char_table_from_text_file(text_file, encoding='utf-8', context_length=6):
+def load_char_table_from_text_file(text_file, context_range=[6,6], encoding='utf-8'):
 	"""generate char_table from one text file"""
 
 	# delimiters = [u'\uff0c', u'\u3002', u'\u3001', u'\u201c', u'\u201d', u'\uff1f', u'\uff01']
 	delimiters = [u'，', u'。', u'、', u'“', u'”', u'？', u'！']
 
 	char_table = {}
-
-	if all_text_files.get(text_file) is None:
-		return {}
-
-	filename = os.path.join(os.getcwd(), "data/txt/", all_text_files[text_file])
-
-	if os.path.isfile(filename):
-
-		text = open(filename).read().decode(encoding).splitlines()
+	filename = os.path.join(os.getcwd(), txt_dir, text_file)
+	text = open(filename).read().decode(encoding).splitlines()
+	
+	for line in text:
+		for d in delimiters:
+			line = line.replace(d, delimiters[0])
+		# print line
+		line = line.split(delimiters[0])
 		
-		for line in text:
-			for d in delimiters:
-				line = line.replace(d, delimiters[0])
-			# print line
-			line = line.split(delimiters[0])
-			
-			for phrase in line:
-				phrase_c = to_chinese(phrase)
-				# print phrase_c + " -- "
+		for phrase in line:
+			phrase_c = to_chinese(phrase)
+			# print phrase_c + " -- "
 
-				for index, char in enumerate(phrase_c):
+			for index, char in enumerate(phrase_c):
 
-					if is_chinese(char):
-						if not char in char_table.keys(): # new character
-							char_table[char] = {'context':[], 'rating':0, 'tabu':set()}
-						
-						# grab context in text
-						context_start = max(0, index - context_length)
-						context_end = min(len(phrase_c), index + context_length + 1)
+				if is_chinese(char):
+					if not char in char_table.keys(): # new character
+						char_table[char] = {'context':[], 'rating':0, 'tabu':set()}
+					
+					# grab context in text
+					context_start = max(0, index - context_range[0])
+					context_end = min(len(phrase_c), index + context_range[1] + 1)
+					if (context_end > context_start + 1): # at least two characters
 						char_table[char]['context'].append({'content':   phrase_c[context_start:context_end],
-															'belongsto': text_file })
+														'belongsto': text_file })
 
 	return char_table
 
 
-
-def process_text_files(text_files=all_text_files.keys(), context_length=6, encoding='utf-8'):
+def process_text_files(text_files, context_range=[6,6], encoding='utf-8'):
 	"""Create character tables and save them to disk
 	char_table is essentially used to save a graph with vertex the character 
 	and directed arc the context relation.
 	"""
-	
-	for file in text_files:
-		print "process %s" % file
+	if text_files is None or len(text_files) == 0:
+		text_files = [f for f in os.listdir(txt_dir) if os.path.isfile(os.path.join(txt_dir,f)) and f.endswith('.txt')]
 
-		char_table = load_char_table_from_text_file(file, encoding, context_length)
+	for txtfile in text_files:
+		print "process %s" % txtfile
+
+		char_table = load_char_table_from_text_file(txtfile, context_range, encoding)
 
 		if len(char_table) > 0:
 			# save char_table to disk
-			txtfile = all_text_files[file]
-			datfile = os.path.join(os.getcwd(), "data/text/", txtfile[:-4]+'.dat')
+			title = txtfile[:-4]
+			datfile = os.path.join(os.getcwd(), dat_dir, title+'.dat')
 			ouf = open(datfile, 'wb')
 			try:
-				marshal.dump(file, ouf)
+				marshal.dump(title, ouf)
 				marshal.dump(char_table, ouf)
+				print "saved in %s" % datfile
 			finally:
 				ouf.close()
 
 
-def load_original_char_table(selected_files=all_text_files.keys()):
+def load_original_char_table(selected_files):
 	"""load char_table from disk"""
+
+	if selected_files is None or len(selected_files) == 0:
+		selected_files = [os.path.join(os.getcwd(), dat_dir, f) for f in os.listdir(dat_dir) if os.path.isfile(os.path.join(dat_dir,f)) and f.endswith('.dat')]
 
 	char_table = {}
 
-	for file in selected_files:
-
-		if all_text_files.get(file) is None:
-			print "%s is not supported yet." % file
-			continue
-
-		print "load %s" % file
-
-		txtfile = all_text_files[file]
-		datfile = os.path.join(os.getcwd(), "data/text/", txtfile[:-4]+'.dat')
+	for datfile in selected_files:
+		print "load %s" % datfile
 		inf = open(datfile, 'rb')
 		try:
 			text_title = marshal.load(inf)
@@ -164,10 +137,10 @@ def print_char_table(char_table):
 
 def main():
 	
-	process_text_files()
+	process_text_files(None, [0,1])
 
-	# text_files = [u"苏轼文选", u"苏轼词选"]
-	# char_table = load_original_char_table(text_files)
+	# char_table = load_original_char_table(None)
+
 	# print_char_table(char_table)
 
 
